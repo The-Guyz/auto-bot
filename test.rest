@@ -1,0 +1,19 @@
+POST http://127.0.0.1:8000/signup   
+Content-Type: application/json
+
+{"email": "gogo@gmail.com","username": "gogo", "password": "Pass1234!"}
+
+
+###
+
+POST http://127.0.0.1:8000/login
+Content-Type: application/json
+
+{"username": "gogo", "password": "Pass1234!"}
+
+###
+GET http://127.0.0.1:8000/test_token
+Content-Type: application/json
+Authorization: Token 6809addb34557ebc1bdcf6a2958fa61baad84f3f
+
+{}
