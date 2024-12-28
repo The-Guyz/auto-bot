@@ -133,10 +133,10 @@ class PostsAPIView(APIView):
     def post(self, request):
         queryset = Posts.objects.all()
 
-        # # Filter queryset based on query parameters
-        # for key, value in request.data.items():
-        #     kwargs = {f'{key}__icontains': value}  # Case-insensitive partial match
-        #     queryset = queryset.filter(**kwargs)
+        # Filter queryset based on query parameters
+        for key, value in request.data.items():
+            kwargs = {f'{key}__icontains': value}  # Case-insensitive partial match
+            queryset = queryset.filter(**kwargs)
 
         serializer = PostsSerializer(queryset, many=True)
         return Response(serializer.data)
