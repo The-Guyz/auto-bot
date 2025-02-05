@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*', 'localhost']
+ALLOWED_HOSTS = ['*', 'localhost', 'autobot-ms-latest.onrender.com']
 
 # redirect urls
 LOGIN_REDIRECT_URL = '/'
@@ -44,11 +44,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'app.apps.AppConfig', 
+    'app.apps.AppConfig',
     "rest_framework",
-    'rest_framework.authtoken', 
-    'cloudinary', 
-    'simple_mail', 
+    'rest_framework.authtoken',
+    'cloudinary',
+    'simple_mail',
 ]
 
 MIDDLEWARE = [
@@ -108,7 +108,7 @@ ALLOWED_HOSTS=['mac-stl-api-production.up.railway.app','127.0.0.1', 'https://mac
 
 CSRF_TRUSTED_ORIGINS = ['https://mac-stl-api-production.up.railway.app']
 
-UPLOADCARE = {  
+UPLOADCARE = {
     'pub_key': config('pub_key'),
     'secret': config('secret'),
 }
