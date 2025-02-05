@@ -1,0 +1,48 @@
+name: Deploy to Dev.
+
+on:
+  push:
+    branches:
+      - main
+
+# Your workflows jobs.
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GH_VERSION: dev-${{github.sha}}
+      GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+    strategy:
+      matrix:
+        python-version: ["pypy3.9"]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      # You can test your matrix by printing the current Python version
+      - name: Build Docker Image.
+        run: docker build -t django/autobot:latest .
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+      - name: Tag docker image
+        run: |
+          docker tag django/autobot:latest autopostbot/autobot-ms:latest
+      - name: Push to registry
+        run: |
+          docker push autopostbot/autobot-ms:latest
+
+
+# docker run -d --name test-sms-mails --restart unless-stopped --network host -p 8000:8000 --env-file .env-example my-django-app-v5
+# docker run -d --name emails --restart unless-stopped --network host -p 8000:8000  --env-file .env-example
+
+# docker run -d --name test-sms-mails2 --restart unless-stopped -p 8000:8000  -p 587:587  --dns=8.8.8.8 --env-file .env-example my-django-app-v5
+
+# docker run -d --name test-sms-mails2 --restart unless-stopped -p 8000:8000  --env-file .env-example my-django-app-v5
+
+# docker run -d --name emails --restart unless-stopped -p 8000:8000 --env-file /opt/envars/laxnit_dev.env 3ma75ms/emails-microservice:latest

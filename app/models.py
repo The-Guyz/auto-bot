@@ -28,8 +28,25 @@ class Company(models.Model):
         return "{}".format(self.name)
 
 
+class ResearchPapers(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='rPapers', related_query_name='rPapers')
+    prompt = models.CharField(max_length=3000)
+    SOCIALS_CHOICES = (
+        ('FACEBOOK', 'FaceBook'),
+        ('INSTAGRAM', 'Instagram'),
+        ('TWITTER', 'Twitter'),
+        ('LINKEDIN', 'LinkedIn'),
+        ('THREADS', 'Threads')
+    )
+    socialMedia =  models.CharField(max_length=40, choices=SOCIALS_CHOICES, null=True, blank=True, default="LINKEDIN")
+    response = models.CharField(max_length=100000, blank=True)
+
+    def __str__(self):
+        return "{}".format(self.prompt)
+
 class Posts(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts', related_query_name='post')
+    rPaper = models.ForeignKey(ResearchPapers, on_delete=models.CASCADE, related_name='posts', related_query_name='post')
     topic = models.CharField(max_length=1000)
     SOCIALS_CHOICES = (
         ('FACEBOOK', 'FaceBook'),
@@ -38,7 +55,7 @@ class Posts(models.Model):
         ('LINKEDIN', 'LinkedIn'),
         ('THREADS', 'Threads')
     )
-    socialsName = models.CharField(max_length=20, choices=SOCIALS_CHOICES)
+    socialsName = models.CharField(max_length=40, choices=SOCIALS_CHOICES, null=True, blank=True)
     content = models.CharField(max_length=100000, blank=True)
     posted = models.BooleanField(default=False)
     approved = models.BooleanField(default=False)
@@ -46,12 +63,20 @@ class Posts(models.Model):
 
     def __str__(self):
         return "{}".format(self.topic)
+        
 
-
-class ResearchPapers(models.Model):
-    post = models.ForeignKey(Posts, on_delete=models.CASCADE, related_name='researchPapers', related_query_name='researchPapers')
-    prompt = models.CharField(max_length=30)
-    response = models.CharField(max_length=100000, blank=True)
+class FieldsToQuery(models.Model):
+    title =  models.CharField(max_length=1000)
+    used = models.BooleanField(default=False)
+    SOCIALS_CHOICES = (
+        ('FACEBOOK', 'FaceBook'),
+        ('INSTAGRAM', 'Instagram'),
+        ('TWITTER', 'Twitter'),
+        ('LINKEDIN', 'LinkedIn'),
+        ('THREADS', 'Threads')
+    )
+    socialMedia =  models.CharField(max_length=40, choices=SOCIALS_CHOICES, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='fields', related_query_name='fields_user')
 
     def __str__(self):
-        return "{}".format(self.prompt)
+        return "{}".format(self.title)

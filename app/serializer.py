@@ -31,3 +31,7 @@ class ResearchPapersSerializer(serializers.ModelSerializer):
         fields = ['prompt', 'response']
 
 
+class FieldsToQuerySerializer(serializers.ModelSerializer):
+    class Meta(object):
+        model = FieldsToQuery
+        fields = ['title', 'socialMedia']
