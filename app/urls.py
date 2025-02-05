@@ -15,4 +15,6 @@ urlpatterns = [
     re_path('createQueryToGetFields/', views.createQueryToGetFields),
     re_path('fieldsToQuery/', FieldsToQueryAPIView.as_view(), name='fieldsToQuery-list'),
     re_path('createArticle', views.createArticle),
+    re_path('linkedinCallback', views.linkedinCallback),
+
 ]

@@ -9,15 +9,24 @@ from rest_framework.response import Response
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404
+from django.conf import settings
 from django.core.mail import EmailMessage
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+from django.views.decorators.csrf import csrf_exempt
 import json
 import threading # threading.Thread(target=background_task).start()
+import requests
 
 
-# Create your views here.   
+# LinkedIn credentials from settings.py
+CLIENT_ID = "settings.LINKEDIN_CLIENT_ID"
+CLIENT_SECRET = "settings.LINKEDIN_CLIENT_SECRET"
+REDIRECT_URI = "settings.LINKEDIN_REDIRECT_URI"
+
+# Create your views here.
 @api_view(['POST'])
 def login(request):
     user = get_object_or_404(User, username = request.data['username'])
@@ -165,16 +174,16 @@ def send_email(request):
         from_email = data.get('from_email')
         recipient_list = data.get('recipient_list')
         cc = data.get('cc', [])
-        bcc = data.get('bcc', []) 
+        bcc = data.get('bcc', [])
 
         html_content = render_to_string(
-            data.get('templateName', '') + ".html", 
+            data.get('templateName', '') + ".html",
             data.get('content'))
 
         # Create EmailMessage object with HTML content
         email = EmailMessage(subject, html_content, from_email, recipient_list, cc, bcc)
         email.content_subtype = 'html'  # Set the content type to HTML
-        
+
         try:
             email.send()
             return JsonResponse({'Message': 'Email sent successfully.', "Status":200, "Payload":{}}, status=200)
@@ -278,4 +287,36 @@ def makeRequestForArtciles(post):
     post.save()
 
 def crunchResponseFromArticlesApiCall(post, response):
+    print()
     pass
+
+
+def linkedinCallback(request):
+    print("Got called ---> ")
+    code = request.GET.get('code')
+    state = request.GET.get('state')
+
+    if not code:
+        return JsonResponse({'error': 'Authorization code not found'}, status=400)
+
+    # Step 3: Exchange Authorization Code for Access Token
+    token_url = 'https://www.linkedin.com/oauth/v2/accessToken'
+    payload = {
+        'grant_type': 'authorization_code',
+        'code': code,
+        'redirect_uri': "REDIRECT_URI",
+        'client_id': "CLIENT_ID",
+        'client_secret': "CLIENT_SECRET"
+    }
+
+    response = requests.post(token_url, data=payload)
+    if response.status_code != 200:
+        return JsonResponse({'error': 'Failed to get access token', 'details': response.json()}, status=400)
+
+    access_token = response.json().get('access_token')
+    expires_in = response.json().get('expires_in')
+
+    return JsonResponse({
+        'access_token': access_token,
+        'expires_in': expires_in
+    })
