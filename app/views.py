@@ -19,12 +19,13 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 import threading # threading.Thread(target=background_task).start()
 import requests
+import os
 
 
 # LinkedIn credentials from settings.py
-CLIENT_ID = "settings.LINKEDIN_CLIENT_ID"
-CLIENT_SECRET = "settings.LINKEDIN_CLIENT_SECRET"
-REDIRECT_URI = "settings.LINKEDIN_REDIRECT_URI"
+CLIENT_ID = os.environ.get('LINKEDIN_CLIENT_ID')
+CLIENT_SECRET = os.environ.get('LINKEDIN_CLIENT_SECRET')
+REDIRECT_URI = os.environ.get('LINKEDIN_REDIRECT_URI')
 
 # Create your views here.
 @api_view(['POST'])
@@ -295,6 +296,7 @@ def linkedinCallback(request):
     print("Got called ---> ")
     code = request.GET.get('code')
     state = request.GET.get('state')
+    print(code)
 
     if not code:
         return JsonResponse({'error': 'Authorization code not found'}, status=400)
@@ -304,9 +306,9 @@ def linkedinCallback(request):
     payload = {
         'grant_type': 'authorization_code',
         'code': code,
-        'redirect_uri': "REDIRECT_URI",
-        'client_id': "CLIENT_ID",
-        'client_secret': "CLIENT_SECRET"
+        'redirect_uri': REDIRECT_URI,
+        'client_id': CLIENT_ID,
+        'client_secret': CLIENT_SECRET
     }
 
     response = requests.post(token_url, data=payload)
